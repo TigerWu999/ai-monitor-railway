@@ -1,20 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const XCMS_BASE_URL = 'http://100.113.105.10:9001';
+// 使用 Railway-XCMS Bridge 服務
+// Bridge 服務可以透過 Tailscale 訪問
+const XCMS_BRIDGE_URL = process.env.XCMS_BRIDGE_URL || 'http://100.113.105.10:8080';
+const XCMS_API_KEY = process.env.XCMS_API_KEY || 'ba980299eaa093c9a3805a779b32c2a619fb5e69737ca721b7ce537910c9d0bb';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const path = params.path?.join('/') || '';
+  const resolvedParams = await params;
+  const path = resolvedParams.path?.join('/') || '';
   const url = new URL(request.url);
-  const targetUrl = `${XCMS_BASE_URL}/${path}${url.search}`;
+  const targetUrl = `${XCMS_BRIDGE_URL}/${path}${url.search}`;
 
   try {
     const response = await fetch(targetUrl, {
       headers: {
         ...Object.fromEntries(request.headers.entries()),
-        host: new URL(XCMS_BASE_URL).host,
+        'X-API-Key': XCMS_API_KEY,
+        host: new URL(XCMS_BRIDGE_URL).host,
       },
     });
 
@@ -56,11 +61,12 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const path = params.path?.join('/') || '';
+  const resolvedParams = await params;
+  const path = resolvedParams.path?.join('/') || '';
   const url = new URL(request.url);
-  const targetUrl = `${XCMS_BASE_URL}/${path}${url.search}`;
+  const targetUrl = `${XCMS_BRIDGE_URL}/${path}${url.search}`;
 
   try {
     const body = await request.text();
@@ -69,7 +75,8 @@ export async function POST(
       method: 'POST',
       headers: {
         ...Object.fromEntries(request.headers.entries()),
-        host: new URL(XCMS_BASE_URL).host,
+        'X-API-Key': XCMS_API_KEY,
+        host: new URL(XCMS_BRIDGE_URL).host,
       },
       body: body,
     });

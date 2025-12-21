@@ -3,148 +3,92 @@ import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Real XCMS Integration API
- * Connects to actual XCMS system through Cloudflare Tunnel
+ * Connects to actual XCMS system through Railway-XCMS Bridge
  */
 
-// XCMS 配置（從 config.json）
-const XCMS_CONFIG = {
-  adminPort: 9001,
-  mediaHttpPort: 9002,
-  mediaRtspPort: 9554,
-  xcmsAssistantPort: 9555,
-  mediaSecret: "aqxY9ps21fyhyKNRyYpGvJCTp1JBeGOM"
-};
+// Railway-XCMS Bridge 配置
+const XCMS_BRIDGE_URL = process.env.XCMS_BRIDGE_URL || 'http://100.113.105.10:8080';
+const XCMS_API_KEY = process.env.XCMS_API_KEY || 'ba980299eaa093c9a3805a779b32c2a619fb5e69737ca721b7ce537910c9d0bb';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const endpoint = searchParams.get('endpoint') || 'status';
 
-  // Use Cloudflare Tunnel URL
-  const xcmsHost = process.env.AI_MONITOR_HOST || 'concerned-commit-superior-vpn.trycloudflare.com';
-  const useHttps = xcmsHost.includes('cloudflare');
-  const protocol = useHttps ? 'https' : 'http';
-
   try {
-    let response;
-    let data;
-
     switch (endpoint) {
       case 'cameras':
-        // 獲取攝影機列表 - 從本地配置檔
-        const cameras = [
-          {
-            id: 1,
-            name: "入口監控",
-            status: "online",
-            stream: `${protocol}://${xcmsHost}/stream/1`,
-            snapshot: `${protocol}://${xcmsHost}/snapshot/1`,
-            recording: true,
-            motion: true
+        // 透過 Bridge 獲取攝影機列表
+        const camerasResponse = await fetch(`${XCMS_BRIDGE_URL}/api/cameras`, {
+          headers: {
+            'X-API-Key': XCMS_API_KEY
           },
-          {
-            id: 2,
-            name: "走廊監控",
-            status: "online",
-            stream: `${protocol}://${xcmsHost}/stream/2`,
-            snapshot: `${protocol}://${xcmsHost}/snapshot/2`,
-            recording: true,
-            motion: false
-          },
-          {
-            id: 3,
-            name: "停車場",
-            status: "offline",
-            stream: null,
-            snapshot: null,
-            recording: false,
-            motion: false
-          }
-        ];
+          signal: AbortSignal.timeout(5000)
+        });
 
+        if (!camerasResponse.ok) {
+          throw new Error('Failed to fetch cameras from Bridge');
+        }
+
+        const camerasData = await camerasResponse.json();
         return NextResponse.json({
           success: true,
-          cameras,
-          total: cameras.length,
-          online: cameras.filter(c => c.status === 'online').length
+          ...camerasData
         });
 
       case 'system':
-        // 獲取系統狀態
-        const adminUrl = `${protocol}://${xcmsHost}${useHttps ? '' : ':' + XCMS_CONFIG.adminPort}`;
-        response = await fetch(adminUrl, {
-          method: 'HEAD',
-          signal: AbortSignal.timeout(3000)
+        // 透過 Bridge 獲取系統狀態
+        const systemResponse = await fetch(`${XCMS_BRIDGE_URL}/api/status`, {
+          headers: {
+            'X-API-Key': XCMS_API_KEY
+          },
+          signal: AbortSignal.timeout(5000)
         });
 
+        if (!systemResponse.ok) {
+          throw new Error('Failed to fetch system status from Bridge');
+        }
+
+        const systemData = await systemResponse.json();
         return NextResponse.json({
           success: true,
-          system: {
-            status: response.ok ? 'online' : 'offline',
-            adminUrl,
-            mediaUrl: `${protocol}://${xcmsHost}${useHttps ? '' : ':' + XCMS_CONFIG.mediaHttpPort}`,
-            rtspUrl: `rtsp://${xcmsHost}:${XCMS_CONFIG.mediaRtspPort}`,
-            config: {
-              adminPort: XCMS_CONFIG.adminPort,
-              mediaPort: XCMS_CONFIG.mediaHttpPort,
-              rtspPort: XCMS_CONFIG.mediaRtspPort
-            }
-          }
+          system: systemData
         });
 
-      case 'events':
-        // 獲取最新事件
-        const events = [
-          {
-            id: 1,
-            timestamp: new Date().toISOString(),
-            camera: "入口監控",
-            type: "motion",
-            description: "偵測到移動",
-            severity: "low"
+      case 'alerts':
+        // 透過 Bridge 獲取警報列表
+        const alertsResponse = await fetch(`${XCMS_BRIDGE_URL}/api/alerts`, {
+          headers: {
+            'X-API-Key': XCMS_API_KEY
           },
-          {
-            id: 2,
-            timestamp: new Date(Date.now() - 300000).toISOString(),
-            camera: "走廊監控",
-            type: "person",
-            description: "偵測到人員",
-            severity: "medium"
-          },
-          {
-            id: 3,
-            timestamp: new Date(Date.now() - 600000).toISOString(),
-            camera: "入口監控",
-            type: "vehicle",
-            description: "偵測到車輛",
-            severity: "low"
-          }
-        ];
+          signal: AbortSignal.timeout(5000)
+        });
 
+        if (!alertsResponse.ok) {
+          throw new Error('Failed to fetch alerts from Bridge');
+        }
+
+        const alertsData = await alertsResponse.json();
         return NextResponse.json({
           success: true,
-          events,
-          total: events.length
+          ...alertsData
         });
 
       default:
-        // 默認狀態檢查
-        const statusUrl = `${protocol}://${xcmsHost}${useHttps ? '' : ':' + XCMS_CONFIG.adminPort}/login`;
-        response = await fetch(statusUrl, {
+        // 默認狀態檢查 - 檢查 Bridge 服務狀態
+        const statusResponse = await fetch(`${XCMS_BRIDGE_URL}/`, {
           signal: AbortSignal.timeout(3000)
         });
+
+        const statusData = await statusResponse.json();
 
         return NextResponse.json({
           success: true,
           status: 'operational',
-          xcms: {
-            host: xcmsHost,
-            admin: response.ok,
-            config: XCMS_CONFIG,
-            endpoints: {
-              cameras: '/api/xcms?endpoint=cameras',
-              system: '/api/xcms?endpoint=system',
-              events: '/api/xcms?endpoint=events'
-            }
+          bridge: statusData,
+          endpoints: {
+            cameras: '/api/xcms?endpoint=cameras',
+            system: '/api/xcms?endpoint=system',
+            alerts: '/api/xcms?endpoint=alerts'
           }
         });
     }
@@ -152,8 +96,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
-      xcms: {
-        host: xcmsHost
+      bridge: {
+        url: XCMS_BRIDGE_URL
       }
     }, { status: 500 });
   }
@@ -163,16 +107,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { action, cameraId, params } = body;
+    const { action, cameraId } = body;
 
-    // 這裡可以添加控制邏輯
-    // 例如：開始/停止錄影、調整攝影機設定等
+    // 透過 Bridge 控制攝影機
+    const controlResponse = await fetch(`${XCMS_BRIDGE_URL}/api/control/${cameraId}/${action}`, {
+      method: 'POST',
+      headers: {
+        'X-API-Key': XCMS_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(5000)
+    });
+
+    if (!controlResponse.ok) {
+      throw new Error('Failed to control camera through Bridge');
+    }
+
+    const controlData = await controlResponse.json();
 
     return NextResponse.json({
       success: true,
-      action,
-      cameraId,
-      message: `Action ${action} executed for camera ${cameraId}`
+      ...controlData
     });
   } catch (error) {
     return NextResponse.json({

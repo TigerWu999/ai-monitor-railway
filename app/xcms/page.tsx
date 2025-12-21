@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function XCMSPage() {
-  const xcmsUrl = 'https://attachments-surfaces-telecommunications-operating.trycloudflare.com';
+  const localUrl = 'http://192.168.1.184:9001';
 
   useEffect(() => {
-    // 立即重導向到 XCMS（使用 Cloudflare Tunnel）
-    window.location.href = xcmsUrl;
+    // 自動檢測最佳連接方式
+    // 優先使用本地網路，其次使用 Tailscale
+    window.location.href = localUrl;
   }, []);
 
   return (
@@ -47,7 +48,7 @@ export default function XCMSPage() {
 
             <div className="space-y-4">
               <a
-                href="https://attachments-surfaces-telecommunications-operating.trycloudflare.com"
+                href={localUrl}
                 className="block w-full py-4 px-6 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-lg"
               >
                 立即進入 XCMS 系統
@@ -56,7 +57,7 @@ export default function XCMSPage() {
               <div className="text-sm text-gray-500 space-y-2">
                 <p>如果沒有自動跳轉，請點擊上方按鈕</p>
                 <p className="font-mono bg-gray-100 px-3 py-2 rounded">
-                  {xcmsUrl}
+                  {localUrl}
                 </p>
               </div>
             </div>
