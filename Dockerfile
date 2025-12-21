@@ -35,9 +35,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Install Tailscale
-RUN apk add --no-cache ca-certificates iptables ip6tables curl bash
-RUN curl -fsSL https://tailscale.com/install.sh | sh
+# We don't need Tailscale anymore - using Cloudflare Tunnel instead!
+# Just install basic utilities
+RUN apk add --no-cache ca-certificates curl
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -47,16 +47,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Tailscale startup script (OAuth version for no expiration)
-COPY docker-entrypoint-oauth.sh /usr/local/bin/docker-entrypoint.sh
+# Copy simple startup script (using Cloudflare Tunnel, no Tailscale needed)
+COPY docker-entrypoint-simple.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Tailscale state directory
-RUN mkdir -p /var/lib/tailscale /var/run/tailscale && \
-    chown -R nextjs:nodejs /var/lib/tailscale /var/run/tailscale
-
-# Note: We don't switch to nextjs user here because Tailscale needs root
-# USER nextjs
+USER nextjs
 
 EXPOSE 3000
 
