@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 export default function XCMSPage() {
   useEffect(() => {
     // 當頁面載入時，自動跳轉到 XCMS 系統
-    const xcmsUrl = process.env.NEXT_PUBLIC_XCMS_URL || 'https://gap-kentucky-thick-later.trycloudflare.com';
+    const xcmsUrl = process.env.NEXT_PUBLIC_XCMS_URL || 'https://suggested-combined-variations-licensed.trycloudflare.com';
 
     // 使用 iframe 嵌入或直接跳轉
     const iframe = document.getElementById('xcms-iframe') as HTMLIFrameElement;
@@ -37,7 +37,7 @@ export default function XCMSPage() {
               <div className="border-2 border-gray-200 rounded-lg overflow-hidden" style={{ height: '800px' }}>
                 <iframe
                   id="xcms-iframe"
-                  src="https://gap-kentucky-thick-later.trycloudflare.com"
+                  src="https://suggested-combined-variations-licensed.trycloudflare.com"
                   className="w-full h-full"
                   frameBorder="0"
                   allow="camera; microphone"
@@ -51,7 +51,7 @@ export default function XCMSPage() {
                 </p>
                 <p className="text-blue-700 text-sm mt-2">
                   如無法顯示，請<a
-                    href="https://gap-kentucky-thick-later.trycloudflare.com"
+                    href="https://suggested-combined-variations-licensed.trycloudflare.com"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline font-semibold"
