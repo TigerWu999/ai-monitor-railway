@@ -3,24 +3,11 @@
 import { useEffect, useState } from 'react';
 
 export default function XCMSPage() {
-  const [countdown, setCountdown] = useState(3);
   const xcmsUrl = 'http://100.113.105.10:9001';
 
   useEffect(() => {
-    // 倒數計時並自動重導向
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          // 直接重導向到 XCMS
-          window.location.href = xcmsUrl;
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
+    // 立即重導向到 XCMS（不用倒數）
+    window.location.href = xcmsUrl;
   }, []);
 
   return (
@@ -50,11 +37,11 @@ export default function XCMSPage() {
             </div>
 
             <div className="mb-8">
-              <div className="text-6xl font-bold text-indigo-600 mb-4">
-                {countdown}
+              <div className="inline-flex items-center justify-center w-16 h-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
               </div>
-              <p className="text-gray-600 text-lg">
-                正在重導向到 XCMS 系統...
+              <p className="text-gray-600 text-lg mt-4">
+                正在載入 XCMS 系統...
               </p>
             </div>
 
