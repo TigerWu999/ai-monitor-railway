@@ -1,4 +1,8 @@
+# AI Monitor Railway Integration
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+**Last update**: 2025-12-21 17:47 - Force redeploy with Cloudflare Tunnel
 
 ## Getting Started
 
