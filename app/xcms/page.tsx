@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 
 export default function XCMSPage() {
-  const xcmsUrl = 'http://100.113.105.10:9001';
+  const xcmsUrl = 'https://attachments-surfaces-telecommunications-operating.trycloudflare.com';
 
   useEffect(() => {
-    // 立即重導向到 XCMS（不用倒數）
+    // 立即重導向到 XCMS（使用 Cloudflare Tunnel）
     window.location.href = xcmsUrl;
   }, []);
 
@@ -47,7 +47,7 @@ export default function XCMSPage() {
 
             <div className="space-y-4">
               <a
-                href={xcmsUrl}
+                href="https://attachments-surfaces-telecommunications-operating.trycloudflare.com"
                 className="block w-full py-4 px-6 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-lg"
               >
                 立即進入 XCMS 系統
