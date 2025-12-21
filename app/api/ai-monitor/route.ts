@@ -5,9 +5,9 @@ import { NextRequest, NextResponse } from 'next/server';
  * AI Monitor System API - System Status
  */
 export async function GET(request: NextRequest) {
-  // Use Cloudflare Tunnel URL directly for reliable connection
-  const aiMonitorHost = process.env.AI_MONITOR_HOST || 'suggested-combined-variations-licensed.trycloudflare.com';
-  const aiMonitorPort = process.env.AI_MONITOR_PORT || '443';
+  // Use Tailscale IP for reliable VPN connection
+  const aiMonitorHost = process.env.AI_MONITOR_HOST || '100.113.105.10';
+  const aiMonitorPort = process.env.AI_MONITOR_PORT || '9001';
   const useHttps = aiMonitorHost.includes('cloudflare') || process.env.AI_MONITOR_USE_HTTPS === 'true';
   const apiKey = process.env.AI_MONITOR_API_KEY;
 
