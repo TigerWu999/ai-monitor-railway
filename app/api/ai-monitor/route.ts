@@ -5,12 +5,17 @@ import { NextRequest, NextResponse } from 'next/server';
  * AI Monitor System API - System Status
  */
 export async function GET(request: NextRequest) {
-  const aiMonitorHost = process.env.AI_MONITOR_HOST || '192.168.1.184';
-  const aiMonitorPort = process.env.AI_MONITOR_PORT || '9001';
+  // Use Cloudflare Tunnel URL directly for reliable connection
+  const aiMonitorHost = process.env.AI_MONITOR_HOST || 'background-largely-sydney-responsibilities.trycloudflare.com';
+  const aiMonitorPort = process.env.AI_MONITOR_PORT || '443';
+  const useHttps = aiMonitorHost.includes('cloudflare') || process.env.AI_MONITOR_USE_HTTPS === 'true';
   const apiKey = process.env.AI_MONITOR_API_KEY;
 
   try {
-    const response = await fetch(`http://${aiMonitorHost}:${aiMonitorPort}`, {
+    const protocol = useHttps ? 'https' : 'http';
+    const url = useHttps ? `https://${aiMonitorHost}` : `http://${aiMonitorHost}:${aiMonitorPort}`;
+
+    const response = await fetch(url, {
       headers: {
         'X-API-Key': apiKey || '',
       },
