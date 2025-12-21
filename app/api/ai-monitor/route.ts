@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request: NextRequest) {
   // Use Cloudflare Tunnel URL directly for reliable connection
-  const aiMonitorHost = process.env.AI_MONITOR_HOST || 'background-largely-sydney-responsibilities.trycloudflare.com';
+  const aiMonitorHost = process.env.AI_MONITOR_HOST || 'concerned-commit-superior-vpn.trycloudflare.com';
   const aiMonitorPort = process.env.AI_MONITOR_PORT || '443';
   const useHttps = aiMonitorHost.includes('cloudflare') || process.env.AI_MONITOR_USE_HTTPS === 'true';
   const apiKey = process.env.AI_MONITOR_API_KEY;
