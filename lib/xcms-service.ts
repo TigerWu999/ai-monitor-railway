@@ -94,7 +94,12 @@ export class XCMSService {
   /**
    * 獲取攝影機串流 URL
    */
-  getStreamUrl(cameraId: number): string {
+  getStreamUrl(cameraId: number): {
+    rtsp: string;
+    http: string;
+    hls: string;
+    snapshot: string;
+  } {
     const host = process.env.XCMS_HOST || '192.168.1.184';
     const rtspPort = process.env.XCMS_RTSP_PORT || '9554';
     const httpPort = process.env.XCMS_MEDIA_PORT || '9002';
