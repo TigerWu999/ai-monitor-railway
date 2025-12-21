@@ -47,8 +47,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Tailscale startup script
-COPY docker-entrypoint.sh /usr/local/bin/
+# Copy Tailscale startup script (OAuth version for no expiration)
+COPY docker-entrypoint-oauth.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Tailscale state directory
