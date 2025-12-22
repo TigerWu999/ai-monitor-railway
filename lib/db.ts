@@ -26,7 +26,7 @@ pool.on('error', (err) => {
 /**
  * 執行查詢
  */
-export async function query<T = any>(
+export async function query<T extends any = any>(
   text: string,
   params?: any[]
 ): Promise<QueryResult<T>> {
