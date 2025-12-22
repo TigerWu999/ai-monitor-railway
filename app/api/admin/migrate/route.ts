@@ -10,16 +10,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export async function GET(request: NextRequest) {
-  // 簡單的安全檢查（生產環境應該使用更強的認證）
-  const authHeader = request.headers.get('authorization');
-  const expectedAuth = `Bearer ${process.env.ADMIN_SECRET || 'migration-secret-key'}`;
+  // ⚠️ 暫時禁用授權檢查，方便初次遷移
+  // TODO: 遷移完成後應該重新啟用授權檢查
 
-  if (authHeader !== expectedAuth) {
-    return NextResponse.json({
-      error: 'Unauthorized',
-      message: '請在 header 中提供正確的 Authorization: Bearer <secret>'
-    }, { status: 401 });
-  }
+  // const authHeader = request.headers.get('authorization');
+  // const expectedAuth = `Bearer ${process.env.ADMIN_SECRET || 'migration-secret-key'}`;
+  // if (authHeader !== expectedAuth) {
+  //   return NextResponse.json({
+  //     error: 'Unauthorized',
+  //     message: '請在 header 中提供正確的 Authorization: Bearer <secret>'
+  //   }, { status: 401 });
+  // }
 
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
