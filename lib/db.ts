@@ -3,7 +3,7 @@
  * Database Connection Layer
  */
 
-import { Pool, PoolClient, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 
 // 建立連接池
 const pool = new Pool({
@@ -26,7 +26,7 @@ pool.on('error', (err) => {
 /**
  * 執行查詢
  */
-export async function query<T extends any = any>(
+export async function query<T extends QueryResultRow = any>(
   text: string,
   params?: any[]
 ): Promise<QueryResult<T>> {
