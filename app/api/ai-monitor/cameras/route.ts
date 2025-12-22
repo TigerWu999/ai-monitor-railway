@@ -83,6 +83,13 @@ export async function GET(request: NextRequest) {
       source: 'xcms',
       totalCameras: aiCameras.length,
       onlineCameras: aiCameras.filter(c => c.status === 'online').length,
+      // 提供 XCMS 端點資訊給前端直接呼叫
+      xcms_endpoints: {
+        local: 'http://192.168.1.184:9001',      // 本地網路（最快）
+        tailscale: 'http://100.113.105.10:9001', // Tailscale VPN
+        media_port: '9002',                       // 媒體串流端口
+        rtsp_port: '9554',                        // RTSP 端口
+      },
     });
   } catch (error) {
     console.error('XCMS Camera API Error:', error);
