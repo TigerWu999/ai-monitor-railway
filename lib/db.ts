@@ -270,7 +270,7 @@ export async function checkCameraAccess(
     LIMIT 1
   `, [tenantId, xcmsCameraId, requiredPermission]);
 
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
 
 // ========== 用戶租戶關聯 ==========
@@ -300,7 +300,7 @@ export async function checkUserTenant(userId: number, tenantId: number): Promise
     'SELECT 1 FROM user_tenants WHERE user_id = $1 AND tenant_id = $2 LIMIT 1',
     [userId, tenantId]
   );
-  return result.rowCount > 0;
+  return (result.rowCount ?? 0) > 0;
 }
 
 export default pool;
